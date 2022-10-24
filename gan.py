@@ -17,26 +17,25 @@ class Generator(nn.Module):
     def __init__(self, channels, gfmaps, latent):
         super(Generator, self).__init__()
         self.main = nn.Sequential(
-            # input is Z, going into a convolution
-            nn.ConvTranspose2d(latent, gfmaps * 8, 4, 1, 0, bias=False),
+
+            nn.ConvTranspose2d(latent, gfmaps * 8, 4, 1, bias=False),
             nn.BatchNorm2d(gfmaps * 8),
             nn.ReLU(True),
-            # state size. (gfmaps*8) x 4 x 4
-            nn.ConvTranspose2d(gfmaps * 8, gfmaps * 4, 4, 2, 1, bias=False),
+
+            nn.ConvTranspose2d(gfmaps * 8, gfmaps * 4, 3, 2, bias=False),
             nn.BatchNorm2d(gfmaps * 4),
             nn.ReLU(True),
-            # state size. (gfmaps*4) x 8 x 8
-            nn.ConvTranspose2d( gfmaps * 4, gfmaps * 2, 4, 2, 1, bias=False),
+
+            nn.ConvTranspose2d( gfmaps * 4, gfmaps * 2, 4, 2, bias=False),
             nn.BatchNorm2d(gfmaps * 2),
             nn.ReLU(True),
-            # state size. (gfmaps*2) x 16 x 16
-            nn.ConvTranspose2d( gfmaps * 2, gfmaps, 4, 2, 1, bias=False),
+
+            nn.ConvTranspose2d( gfmaps * 2, gfmaps, 3, 2, bias=False),
             nn.BatchNorm2d(gfmaps),
             nn.ReLU(True),
-            # state size. (gfmaps) x 32 x 32
-            nn.ConvTranspose2d( gfmaps, channels, 4, 2, 1, bias=False),
+
+            nn.ConvTranspose2d( gfmaps, channels, 2, 1, bias=False),
             nn.Tanh()
-            # state size. (channels) x 64 x 64
         )
 
     def forward(self, input):
@@ -47,23 +46,23 @@ class Discriminator(nn.Module):
     def __init__(self, channels, dfmaps):
         super(Discriminator, self).__init__()
         self.main = nn.Sequential(
-            # input is (channels) x 64 x 64
-            nn.Conv2d(channels, dfmaps, 4, 2, 1, bias=False),
+
+            nn.Conv2d(channels, dfmaps, 4, 2, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (dfmaps) x 32 x 32
-            nn.Conv2d(dfmaps, dfmaps * 2, 4, 2, 1, bias=False),
+
+            nn.Conv2d(dfmaps, dfmaps * 2, 2, 2, bias=False),
             nn.BatchNorm2d(dfmaps * 2),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (dfmaps*2) x 16 x 16
-            nn.Conv2d(dfmaps * 2, dfmaps * 4, 4, 2, 1, bias=False),
+
+            nn.Conv2d(dfmaps * 2, dfmaps * 4, 2, 2, bias=False),
             nn.BatchNorm2d(dfmaps * 4),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (dfmaps*4) x 8 x 8
-            nn.Conv2d(dfmaps * 4, dfmaps * 8, 4, 2, 1, bias=False),
+
+            nn.Conv2d(dfmaps * 4, dfmaps * 8, 2, 2, bias=False),
             nn.BatchNorm2d(dfmaps * 8),
             nn.LeakyReLU(0.2, inplace=True),
-            # state size. (dfmaps*8) x 4 x 4
-            nn.Conv2d(dfmaps * 8, 1, 4, 1, 0, bias=False),
+
+            nn.Conv2d(dfmaps * 8, 1, 2, bias=False), 
             nn.Sigmoid()
         )
 

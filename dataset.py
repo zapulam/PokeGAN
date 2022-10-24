@@ -1,7 +1,8 @@
 import os
-import cv2
+import torchvision.transforms as transforms
+
+from PIL import Image 
 from torch.utils.data import Dataset
-from torchvision.transforms import ToTensor
 
 
 class PokemonSprites(Dataset):
@@ -13,10 +14,13 @@ class PokemonSprites(Dataset):
 
     def __getitem__(self, idx):
         img_path = self.imgs[idx]
-        img = cv2.imread(img_path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = Image.open(img_path)
+        img = img.convert('RGB')
         
-        transform = ToTensor()
+        transform = transforms.Compose([
+            transforms.CenterCrop(42), 
+            transforms.ToTensor()])
+
         img = transform(img)
 
         return img
