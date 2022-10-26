@@ -73,8 +73,8 @@ class Discriminator(nn.Module):
 class GAN():
     def __init__(self, device, gfmaps, dfmaps, latent):
         if torch.cuda.is_available() and device != 'cpu':
-            self.generator = Generator(4, gfmaps, latent).to(device)
-            self.discriminator = Discriminator(4, dfmaps).to(device)
+            self.generator = Generator(gfmaps, latent).to(device)
+            self.discriminator = Discriminator(dfmaps).to(device)
         else:
             self.generator = Generator(gfmaps, latent)
             self.discriminator = Discriminator(dfmaps)
