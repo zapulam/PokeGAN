@@ -13,7 +13,7 @@ class PokemonSprites(Dataset):
         self.transform = T.Compose([
             T.CenterCrop(42), 
             T.RandomHorizontalFlip(0.0),
-            T.Resize(size=(128,128), interpolation=torchvision.transforms.functional.InterpolationMode.NEAREST),
+            T.Resize(size=(128, 128), interpolation=torchvision.transforms.functional.InterpolationMode.NEAREST),
             T.ToTensor()])
 
     def __len__(self):

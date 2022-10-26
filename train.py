@@ -1,7 +1,9 @@
 import os
 import torch
 import argparse
+import torchvision
 import torchvision.utils as vutils
+import torchvision.transforms as T
 
 from tqdm import tqdm
 from torch import nn, optim
@@ -14,8 +16,8 @@ from dataset import PokemonSprites
 
 def train(args):
     # Parameters
-    data_path, save_path, epochs, batch_size, lr, beta1, device, workers, gfmaps, dfmaps, latent =\
-        args.data_path, args.save_path, args.epochs, args.batch_size, args.beta1, args.lr,  args.device, args.workers, args.gfmaps, args.dfmaps, args.latent
+    data_path, save_path, epochs, batch_size, lr, betas, device, workers, gfmaps, dfmaps, latent =\
+        args.data_path, args.save_path, args.epochs, args.batch_size, args.lr, args.betas, args.device, args.workers, args.gfmaps, args.dfmaps, args.latent
 
     # Create weights directory
     if not os.path.isdir(save_path):
@@ -43,8 +45,8 @@ def train(args):
     fake_label = 0.
 
     # Setup Adam optimizers for both Generator and Discriminator
-    optimizerD = optim.Adam(gan.discriminator.parameters(), lr=lr, betas=(beta1, 0.005))
-    optimizerG = optim.Adam(gan.generator.parameters(), lr=lr, betas=(beta1, 0.005))
+    optimizerD = optim.Adam(gan.discriminator.parameters(), lr=lr, betas=betas)
+    optimizerG = optim.Adam(gan.generator.parameters(), lr=lr, betas=betas)
 
     # Logging
     G_losses, D_losses, iters, best = [], [], 0, 1000
@@ -144,6 +146,10 @@ def train(args):
 
         with torch.no_grad():
             generated = gan.generator(fixed_noise).detach().cpu()
+
+            transform = T.Resize(size=(42, 42), interpolation=torchvision.transforms.functional.InterpolationMode.NEAREST)
+            generated = transform(generated)
+
             imgs = vutils.make_grid(generated, padding=2, normalize=True)
             save_image(imgs, os.path.join('.\\generated', 'epoch'+str(epoch+1)+'.png'))
 
@@ -156,7 +162,7 @@ def parse_args():
     parser.add_argument('--save-path', type=str, help='path to save weights', default='./weights')
     parser.add_argument('--batch-size', type=int, default=128, help='batch size')
     parser.add_argument('--lr', type=float, default=0.0005, help='learning rate')
-    parser.add_argument('--beta1', type=float, default=0.0005, help='beta1 hyperparam for Adam optimizers')
+    parser.add_argument('--betas', type=tuple, default=(0.005, 0.05), help='beta1 hyperparam for Adam optimizers')
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:0 or cpu')
     parser.add_argument('--workers', type=int, default=0, help='number of workers')
     parser.add_argument('--gfmaps', type=int, default=64, help='number of generator feature maps')
