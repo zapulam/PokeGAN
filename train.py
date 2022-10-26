@@ -6,6 +6,7 @@ import torchvision.utils as vutils
 from tqdm import tqdm
 from torch import nn, optim
 from torch.utils.data import DataLoader
+from torchvision.utils import save_image
 
 from gan import GAN
 from dataset import PokemonSprites
@@ -19,6 +20,10 @@ def train(args):
     # Create weights directory
     if not os.path.isdir(save_path):
         os.mkdir(os.path.join(save_path))
+
+    # Create generator test directory
+    if not os.path.isdir('.\\generated'):
+        os.mkdir(os.path.join('.\\generated'))
 
     # Create datasets
     dataset = PokemonSprites(data_path)
@@ -38,11 +43,11 @@ def train(args):
     fake_label = 0.
 
     # Setup Adam optimizers for both Generator and Discriminator
-    optimizerD = optim.Adam(gan.discriminator.parameters(), lr=lr, betas=(beta1, 0.999))
-    optimizerG = optim.Adam(gan.generator.parameters(), lr=lr, betas=(beta1, 0.999))
+    optimizerD = optim.Adam(gan.discriminator.parameters(), lr=lr, betas=(beta1, 0.005))
+    optimizerG = optim.Adam(gan.generator.parameters(), lr=lr, betas=(beta1, 0.005))
 
     # Logging
-    img_list, G_losses, D_losses, iters, best = [], [], [], 0, 1000
+    G_losses, D_losses, iters, best = [], [], 0, 1000
 
     # Begin training
     for epoch in range(epochs):
@@ -117,25 +122,15 @@ def train(args):
             # Update G
             optimizerG.step()
 
-
-            # Output training stats
-            """
-            if i % 50 == 0:
+            """             # Output training stats
+            if i % 2 == 0:
                 print('\n[%d/%d][%d/%d]\tLoss_D: %.4f\tLoss_G: %.4f\tD(x): %.4f\tD(G(z)): %.4f / %.4f'
                     % (epoch, epochs, i, len(dataloader),
-                        errD.item(), errG.item(), D_x, D_G_z1, D_G_z2))"""
+                        lossD.item(), lossG.item(), D_y, D_G_y1, D_G_y2)) """
 
             # Save Losses for plotting later
             G_losses.append(lossG.item())
             D_losses.append(lossD.item())
-
-            # Check how the generator is doing by saving G's output on fixed_noise
-            if (iters % 50 == 0) or ((epoch == epochs-1) and (i == len(dataloader)-1)):
-                with torch.no_grad():
-                    fake = gan.generator(fixed_noise).detach().cpu()
-                img_list.append(vutils.make_grid(fake, padding=2, normalize=True))
-
-            iters += 1
 
             # Save latest model
             torch.save(gan.generator.state_dict(), os.path.join(save_path, "last.pth"))
@@ -145,20 +140,28 @@ def train(args):
                 best = lossG
                 torch.save(gan.generator.state_dict(), os.path.join(save_path, "best.pth"))
 
+            iters += 1
+
+        with torch.no_grad():
+            generated = gan.generator(fixed_noise).detach().cpu()
+            imgs = vutils.make_grid(generated, padding=2, normalize=True)
+            save_image(imgs, os.path.join('.\\generated', 'epoch'+str(epoch+1)+'.png'))
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-path', type=str, help='path to images folder')
-    parser.add_argument('--save-path', type=str, help='path to save weights', default='./weights')
     parser.add_argument('--epochs', type=int, help='number of training epochs')
-    parser.add_argument('--batch-size', type=int, default=32, help='batch size')
+
+    parser.add_argument('--save-path', type=str, help='path to save weights', default='./weights')
+    parser.add_argument('--batch-size', type=int, default=128, help='batch size')
     parser.add_argument('--lr', type=float, default=0.0005, help='learning rate')
-    parser.add_argument('--beta1', type=float, default=0.5, help='beta1 hyperparam for Adam optimizers')
+    parser.add_argument('--beta1', type=float, default=0.0005, help='beta1 hyperparam for Adam optimizers')
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:0 or cpu')
     parser.add_argument('--workers', type=int, default=0, help='number of workers')
     parser.add_argument('--channels', type=int, default=3, help='number of color channels')
-    parser.add_argument('--gfmaps', type=int, default=42, help='number of generator feature maps')
-    parser.add_argument('--dfmaps', type=int, default=42, help='number of discriminator feature maps')
+    parser.add_argument('--gfmaps', type=int, default=64, help='number of generator feature maps')
+    parser.add_argument('--dfmaps', type=int, default=64, help='number of discriminator feature maps')
     parser.add_argument('--latent', type=str, default=100, help='size of latent vector')
 
     args = parser.parse_args()
