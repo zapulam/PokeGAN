@@ -19,6 +19,7 @@ class PokemonSprites(Dataset):
         
         transform = transforms.Compose([
             transforms.CenterCrop(42), 
+            transforms.RandomHorizontalFlip(0.5),
             transforms.ToTensor()])
 
         img = transform(img)
