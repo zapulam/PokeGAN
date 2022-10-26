@@ -14,7 +14,7 @@ def weights_init(m):
 
 
 class Generator(nn.Module):
-    def __init__(self, channels, gfmaps, latent):
+    def __init__(self, gfmaps, latent):
         super(Generator, self).__init__()
         self.main = nn.Sequential(
 
@@ -34,7 +34,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(gfmaps),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d( gfmaps, channels, 2, 1, bias=False),
+            nn.ConvTranspose2d( gfmaps, 4, 2, 1, bias=False),
             nn.Tanh()
         )
 
@@ -43,11 +43,11 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, channels, dfmaps):
+    def __init__(self, dfmaps):
         super(Discriminator, self).__init__()
         self.main = nn.Sequential(
 
-            nn.Conv2d(channels, dfmaps, 4, 2, bias=False),
+            nn.Conv2d(4, dfmaps, 4, 2, bias=False),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(dfmaps, dfmaps * 2, 2, 2, bias=False),
@@ -71,13 +71,13 @@ class Discriminator(nn.Module):
 
 
 class GAN():
-    def __init__(self, device, channels, gfmaps, dfmaps, latent):
+    def __init__(self, device, gfmaps, dfmaps, latent):
         if torch.cuda.is_available() and device != 'cpu':
-            self.generator = Generator(channels, gfmaps, latent).to(device)
-            self.discriminator = Discriminator(channels, dfmaps).to(device)
+            self.generator = Generator(4, gfmaps, latent).to(device)
+            self.discriminator = Discriminator(4, dfmaps).to(device)
         else:
-            self.generator = Generator(channels, gfmaps, latent)
-            self.discriminator = Discriminator(channels, dfmaps)
+            self.generator = Generator(gfmaps, latent)
+            self.discriminator = Discriminator(dfmaps)
 
         self.generator.apply(weights_init)
         self.discriminator.apply(weights_init)

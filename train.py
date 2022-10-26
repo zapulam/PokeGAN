@@ -14,8 +14,8 @@ from dataset import PokemonSprites
 
 def train(args):
     # Parameters
-    data_path, save_path, epochs, batch_size, lr, beta1, device, workers, channels, gfmaps, dfmaps, latent =\
-        args.data_path, args.save_path, args.epochs, args.batch_size, args.beta1, args.lr,  args.device, args.workers, args.channels, args.gfmaps, args.dfmaps, args.latent
+    data_path, save_path, epochs, batch_size, lr, beta1, device, workers, gfmaps, dfmaps, latent =\
+        args.data_path, args.save_path, args.epochs, args.batch_size, args.beta1, args.lr,  args.device, args.workers, args.gfmaps, args.dfmaps, args.latent
 
     # Create weights directory
     if not os.path.isdir(save_path):
@@ -30,7 +30,7 @@ def train(args):
     dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, num_workers=workers)
 
     # Create model (Generator and Discriminator)
-    gan = GAN(device, channels, gfmaps, dfmaps, latent)
+    gan = GAN(device, gfmaps, dfmaps, latent)
 
     # Define loss function
     criterion = nn.BCELoss()
@@ -159,7 +159,6 @@ def parse_args():
     parser.add_argument('--beta1', type=float, default=0.0005, help='beta1 hyperparam for Adam optimizers')
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:0 or cpu')
     parser.add_argument('--workers', type=int, default=0, help='number of workers')
-    parser.add_argument('--channels', type=int, default=3, help='number of color channels')
     parser.add_argument('--gfmaps', type=int, default=64, help='number of generator feature maps')
     parser.add_argument('--dfmaps', type=int, default=64, help='number of discriminator feature maps')
     parser.add_argument('--latent', type=str, default=100, help='size of latent vector')
