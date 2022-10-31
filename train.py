@@ -160,14 +160,14 @@ def parse_args():
     parser.add_argument('--epochs', type=int, help='number of training epochs')
 
     parser.add_argument('--save-path', type=str, help='path to save weights', default='./weights')
-    parser.add_argument('--batch-size', type=int, default=128, help='batch size')
+    parser.add_argument('--batch-size', type=int, default=64, help='batch size')
     parser.add_argument('--lr', type=float, default=0.0005, help='learning rate')
     parser.add_argument('--betas', type=tuple, default=(0.005, 0.05), help='beta1 hyperparam for Adam optimizers')
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:0 or cpu')
     parser.add_argument('--workers', type=int, default=0, help='number of workers')
     parser.add_argument('--gfmaps', type=int, default=64, help='number of generator feature maps')
     parser.add_argument('--dfmaps', type=int, default=64, help='number of discriminator feature maps')
-    parser.add_argument('--latent', type=str, default=100, help='size of latent vector')
+    parser.add_argument('--latent', type=str, default=200, help='size of latent vector')
 
     args = parser.parse_args()
     return args

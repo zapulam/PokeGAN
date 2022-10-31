@@ -26,7 +26,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(gfmaps*8),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d(gfmaps*8, gfmaps*8, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(gfmaps*8, gfmaps*8, 4, 1, 1, bias=False),
             nn.BatchNorm2d(gfmaps*8),
             nn.ReLU(True),
 
@@ -34,7 +34,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(gfmaps*4),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d(gfmaps*4, gfmaps*2, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(gfmaps*4, gfmaps*2, 4, 1, 1, bias=False),
             nn.BatchNorm2d(gfmaps*2),
             nn.ReLU(True),
 
@@ -42,7 +42,7 @@ class Generator(nn.Module):
             nn.BatchNorm2d(gfmaps),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d(gfmaps, 4, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(gfmaps, 4, 4, 2, 2, bias=False),
             nn.Tanh()
         )
 
