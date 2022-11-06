@@ -1,7 +1,6 @@
 import os
 import torch
 import argparse
-import torchvision
 import torchvision.utils as vutils
 import torchvision.transforms as T
 
@@ -38,7 +37,7 @@ def train(args):
     criterion = nn.BCELoss()
 
     # Create latent vector batch
-    fixed_noise = torch.randn(64, latent, 1, 1, device=device)
+    fixed_noise = torch.randn(batch_size, latent, 1, 1, device=device)
 
     # Establish convention for real and fake labels during training
     real_label = 1.
@@ -50,6 +49,13 @@ def train(args):
 
     # Logging
     G_losses, D_losses, iters, best = [], [], 0, 1000
+
+    # Generation pre-training
+    with torch.no_grad():
+        generated = gan.generator(fixed_noise).detach().cpu()
+
+        imgs = vutils.make_grid(generated, padding=2, normalize=True)
+        save_image(imgs, os.path.join('.\\generated', 'epoch0.png'))
 
     # Begin training
     for epoch in range(epochs):
@@ -147,9 +153,6 @@ def train(args):
         with torch.no_grad():
             generated = gan.generator(fixed_noise).detach().cpu()
 
-            transform = T.Resize(size=(42, 42), interpolation=torchvision.transforms.functional.InterpolationMode.NEAREST)
-            generated = transform(generated)
-
             imgs = vutils.make_grid(generated, padding=2, normalize=True)
             save_image(imgs, os.path.join('.\\generated', 'epoch'+str(epoch+1)+'.png'))
 
@@ -165,9 +168,9 @@ def parse_args():
     parser.add_argument('--betas', type=tuple, default=(0.0005, 0.005), help='beta1 hyperparam for Adam optimizers')
     parser.add_argument('--device', type=str, default='cuda:0', help='device; cuda:0 or cpu')
     parser.add_argument('--workers', type=int, default=0, help='number of workers')
-    parser.add_argument('--gfmaps', type=int, default=64, help='number of generator feature maps')
-    parser.add_argument('--dfmaps', type=int, default=64, help='number of discriminator feature maps')
-    parser.add_argument('--latent', type=str, default=200, help='size of latent vector')
+    parser.add_argument('--gfmaps', type=int, default=32, help='number of generator feature maps')
+    parser.add_argument('--dfmaps', type=int, default=32, help='number of discriminator feature maps')
+    parser.add_argument('--latent', type=str, default=100, help='size of latent vector')
 
     args = parser.parse_args()
     return args

@@ -1,9 +1,7 @@
 import torch
-import torchvision
 import torch.nn as nn
 import torch.utils.data
 import torch.nn.parallel
-import torchvision.transforms as T
 
 
 def weights_init(m):
@@ -18,7 +16,6 @@ def weights_init(m):
 class Generator(nn.Module):
     def __init__(self, gfmaps, latent):
         super(Generator, self).__init__()
-        self.transform = T.Resize(size=(42, 42), interpolation=torchvision.transforms.functional.InterpolationMode.NEAREST)
 
         self.main = nn.Sequential(
 
@@ -38,11 +35,15 @@ class Generator(nn.Module):
             nn.BatchNorm2d(gfmaps*2),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d(gfmaps*2, gfmaps, 4, 2, 1, bias=False),
+            nn.ConvTranspose2d(gfmaps*2, gfmaps, 4, 2, 0, bias=False),
             nn.BatchNorm2d(gfmaps),
             nn.ReLU(True),
 
-            nn.ConvTranspose2d(gfmaps, 4, 4, 2, 2, bias=False),
+            nn.ConvTranspose2d(gfmaps, gfmaps, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(gfmaps),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps, 4, 4, 2, 0, bias=False),
             nn.Tanh()
         )
 
