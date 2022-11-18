@@ -140,21 +140,22 @@ def train(args):
             G_losses.append(lossG.item())
             D_losses.append(lossD.item())
 
-            # Save latest model
-            torch.save(gan.generator.state_dict(), os.path.join(save_path, "last.pth"))
+        # Save latest model
+        torch.save(gan.generator.state_dict(), os.path.join(save_path, "last.pth"))
 
-            # Save best model
-            if lossG < best:
-                best = lossG
-                torch.save(gan.generator.state_dict(), os.path.join(save_path, "best.pth"))
+        # Save best model
+        if G_losses[-1] < best:
+            best = G_losses[-1]
+            torch.save(gan.generator.state_dict(), os.path.join(save_path, "best.pth"))
 
-            iters += 1
+        iters += 1
 
-        with torch.no_grad():
-            generated = gan.generator(fixed_noise).detach().cpu()
+        if (epoch+1) % 10 == 0:
+            with torch.no_grad():
+                generated = gan.generator(fixed_noise).detach().cpu()
 
-            imgs = vutils.make_grid(generated, padding=2, normalize=True)
-            save_image(imgs, os.path.join('.\\generated', 'epoch'+str(epoch+1)+'.png'))
+                imgs = vutils.make_grid(generated, padding=2, normalize=True)
+                save_image(imgs, os.path.join('.\\generated', 'epoch'+str(epoch+1)+'.png'))
 
 
 def parse_args():
