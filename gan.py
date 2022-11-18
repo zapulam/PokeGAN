@@ -12,6 +12,88 @@ def weights_init(m):
         nn.init.normal_(m.weight.data, 1.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
 
+"""
+class Generator(nn.Module):
+    def __init__(self, gfmaps, latent):
+        super(Generator, self).__init__()
+
+        self.main = nn.Sequential(
+
+            nn.ConvTranspose2d(latent, gfmaps*4, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(gfmaps*4),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*4, gfmaps*4, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(gfmaps*4),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*4, gfmaps*4, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(gfmaps*4),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*4, gfmaps*4, 4, 1, 1, bias=False),
+            nn.BatchNorm2d(gfmaps*4),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*4, gfmaps*2, 4, 1, 1, bias=False),
+            nn.BatchNorm2d(gfmaps*2),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*2, gfmaps*2, 4, 1, 1, bias=False),
+            nn.BatchNorm2d(gfmaps*2),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*2, gfmaps*2, 4, 2, 0, bias=False),
+            nn.BatchNorm2d(gfmaps*2),
+            nn.ReLU(True),
+
+            nn.ConvTranspose2d(gfmaps*2, 4, 4, 2, 1, bias=False),
+            nn.Tanh()
+        )
+
+    def forward(self, input):
+        return self.main(input)
+   
+
+class Discriminator(nn.Module):
+    def __init__(self, dfmaps):
+        super(Discriminator, self).__init__()
+        self.main = nn.Sequential(
+
+            nn.Conv2d(4, dfmaps, 2, 2, bias=False),
+            nn.LeakyReLU(0.2, inplace=True),
+
+            nn.Conv2d(dfmaps, dfmaps, 4, 1, bias=False),
+            nn.BatchNorm2d(dfmaps),
+            nn.LeakyReLU(0.2, inplace=True),
+
+            nn.Conv2d(dfmaps, dfmaps*2, 4, 1, bias=False),
+            nn.BatchNorm2d(dfmaps * 2),
+            nn.LeakyReLU(0.2, inplace=True),
+
+            nn.Conv2d(dfmaps*2, dfmaps*2, 2, 2, bias=False),
+            nn.BatchNorm2d(dfmaps * 2),
+            nn.LeakyReLU(0.2, inplace=True),
+
+            nn.Conv2d(dfmaps*2, dfmaps*4, 2, 1, bias=False),
+            nn.BatchNorm2d(dfmaps * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+
+            nn.Conv2d(dfmaps*4, dfmaps*4, 2, bias=False),
+            nn.BatchNorm2d(dfmaps * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+
+            nn.AdaptiveAvgPool2d(2),
+            nn.Flatten(),
+            nn.Linear(dfmaps*4*2*2, 64),
+            nn.Linear(64, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, input):
+        return self.main(input)
+"""
+
 
 class Generator(nn.Module):
     def __init__(self, gfmaps, latent):
