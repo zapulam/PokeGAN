@@ -75,6 +75,8 @@ def scrape_artwork(args):
         with open(file_path, "wb") as f:
             image.save(f, "PNG")
 
+    print(f"Total of {len(img_urls)} saved to {save_path}/")
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
