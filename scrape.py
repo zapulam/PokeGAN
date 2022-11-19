@@ -53,7 +53,7 @@ def scrape(args):
     os.remove("images\\s.png")
 
     if len(os.listdir('images')) == 898:
-        print("\ncongratulations, all images saved!")
+        print("\nCongratulations, all images saved!")
     elif len(os.listdir('images')) < 898:
         print("Sorry, some images did not save for some reason...")
     else:
