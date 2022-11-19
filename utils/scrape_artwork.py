@@ -79,7 +79,7 @@ def scrape_artwork(args):
             with open(file_path, "wb") as f:
                 image.save(f, "PNG")
     
-    os.remove("images\\header-sm.jpg")
+    os.remove("{save_path}\\header-sm.jpg")
 
     print(f"Total of {len(img_urls)} saved to {save_path}/")
 
