@@ -73,11 +73,13 @@ def scrape_artwork(args):
         file_path = os.path.join(save_path, os.path.basename(os.path.normpath(url))[:-4] + ".png")
 
         if os.path.isfile(file_path):
-            with open(file_path[:-4] + '_2', "wb") as f:
+            with open(file_path[:-4] + '_2.jpg', "wb") as f:
                 image.save(f, "PNG")
         else:
             with open(file_path, "wb") as f:
                 image.save(f, "PNG")
+    
+    os.remove("images\\header-sm.jpg")
 
     print(f"Total of {len(img_urls)} saved to {save_path}/")
 
