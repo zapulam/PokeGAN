@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 
-def scrape(args):
+def scrape_sprites(args):
     chromedriver, url, save_path = \
         args.chromedriver, args.url, args.save_path
 
@@ -72,4 +72,4 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    scrape(args)
+    scrape_sprites(args)
