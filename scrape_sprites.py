@@ -64,7 +64,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--chromedriver', type=str, default='chromedriver.exe', help='path to chromedriver.exe')
     parser.add_argument('--url', type=str, default='https://pokemondb.net/sprites', help='Pokemon Database URL')
-    parser.add_argument('--save_path', type=str, default='', help='folder to save images')
+    parser.add_argument('--save_path', type=str, default='sprites', help='folder to save images')
 
     args = parser.parse_args()
     return args
