@@ -9,29 +9,36 @@ from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image
 
-from gan import GAN
-from dataset import PokemonSprites
+from gan.sprites_GAN import GAN4
+from gan.artwork_GAN import GAN3
+from dataset import PokemonSprites, PokemonArtwork
 
 
 def train(args):
     # Parameters
-    data_path, save_path, epochs, batch_size, lr, betas, device, workers, gfmaps, dfmaps, latent =\
-        args.data_path, args.save_path, args.epochs, args.batch_size, args.lr, args.betas, args.device, args.workers, args.gfmaps, args.dfmaps, args.latent
+    data_path, type, save_path, epochs, batch_size, lr, betas, device, workers, gfmaps, dfmaps, latent =\
+        args.data_path, args.type, args.save_path, args.epochs, args.batch_size, args.lr, args.betas, args.device, args.workers, args.gfmaps, args.dfmaps, args.latent
 
     # Create weights directory
-    if not os.path.isdir(save_path):
-        os.mkdir(os.path.join(save_path))
+    if not os.path.isdir(os.path.join(save_path, type)):
+        os.mkdir(os.path.join(save_path, type))
 
     # Create generator test directory
-    if not os.path.isdir('.\\generated'):
-        os.mkdir(os.path.join('.\\generated'))
+    if not os.path.isdir(os.path.join('.\\generated', type)):
+        os.mkdir(os.path.join(os.path.join('.\\generated', type)))
 
     # Create datasets
-    dataset = PokemonSprites(data_path)
+    if type == 'sprites':
+        dataset = PokemonSprites(data_path)
+    else:
+        dataset = PokemonArtwork(data_path)
     dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True, num_workers=workers)
 
     # Create model (Generator and Discriminator)
-    gan = GAN(device, gfmaps, dfmaps, latent)
+    if type == 'sprites':
+        gan = GAN4(device, gfmaps, dfmaps, latent)
+    else:
+        gan = GAN3(device, gfmaps, dfmaps, latent)
 
     # Define loss function
     criterion = nn.BCELoss()
@@ -55,7 +62,7 @@ def train(args):
         generated = gan.generator(fixed_noise).detach().cpu()
 
         imgs = vutils.make_grid(generated, padding=2, normalize=True)
-        save_image(imgs, os.path.join('.\\generated', 'epoch0.png'))
+        save_image(imgs, os.path.join('.\\generated', type, 'epoch0.png'))
 
     # Begin training
     for epoch in range(epochs):
@@ -141,12 +148,12 @@ def train(args):
             D_losses.append(lossD.item())
 
         # Save latest model
-        torch.save(gan.generator.state_dict(), os.path.join(save_path, "last.pth"))
+        torch.save(gan.generator.state_dict(), os.path.join(save_path, type, "last.pth"))
 
         # Save best model
         if G_losses[-1] < best:
             best = G_losses[-1]
-            torch.save(gan.generator.state_dict(), os.path.join(save_path, "best.pth"))
+            torch.save(gan.generator.state_dict(), os.path.join(save_path, type, "best.pth"))
 
         iters += 1
 
@@ -155,12 +162,13 @@ def train(args):
                 generated = gan.generator(fixed_noise).detach().cpu()
 
                 imgs = vutils.make_grid(generated, padding=2, normalize=True)
-                save_image(imgs, os.path.join('.\\generated', 'epoch'+str(epoch+1)+'.png'))
+                save_image(imgs, os.path.join('.\\generated', type, 'epoch'+str(epoch+1)+'.png'))
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data-path', type=str, help='path to images folder')
+    parser.add_argument('--type', type=str, choices=['sprites', 'artwork'], help='choose sprites or artworks')
     parser.add_argument('--epochs', type=int, help='number of training epochs')
 
     parser.add_argument('--save-path', type=str, help='path to save weights', default='./weights')
